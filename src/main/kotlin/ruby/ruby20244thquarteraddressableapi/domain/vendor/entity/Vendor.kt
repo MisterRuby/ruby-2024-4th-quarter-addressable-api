@@ -20,10 +20,12 @@ class Vendor (
     @Column(nullable = false)
     val deleted: Boolean,
 
+
+) : BaseColumn() {
     @OneToMany(mappedBy = "vendorRoleId.vendor", cascade = [CascadeType.REMOVE])
-    val vendorRoleList: MutableList<VendorRole> = mutableListOf(),
+    val vendorRoleList: MutableList<VendorRole> = mutableListOf()
     @OneToOne(fetch = LAZY)
-    var representativeUserInfo: UserInfo,
+    var representativeUserInfo: UserInfo? = null
     @OneToMany(mappedBy = "vendor", cascade = [CascadeType.REMOVE])
-    val userInfoList: MutableList<UserInfo> = mutableListOf(),
-) : BaseColumn()
+    val userInfoList: MutableList<UserInfo> = mutableListOf()
+}

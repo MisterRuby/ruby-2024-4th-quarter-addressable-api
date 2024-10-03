@@ -1,6 +1,19 @@
 package ruby.ruby20244thquarteraddressableapi.domain.vendor.repository
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
+import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorSearch
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.entity.Vendor
 
-interface VendorRepository : JpaRepository<Vendor, Long>
+interface VendorRepository : JpaRepository<Vendor, Long> {
+
+    @Query("select v from Vendor v " +
+            "where v.name like %:search% " +
+            "or v.email like %:search% " +
+            "or v.companyNumber like %:search% " +
+            "order by v.id desc")
+    fun findBySearch(@Param("search") search: String, pageable: Pageable) : Page<Vendor>
+}

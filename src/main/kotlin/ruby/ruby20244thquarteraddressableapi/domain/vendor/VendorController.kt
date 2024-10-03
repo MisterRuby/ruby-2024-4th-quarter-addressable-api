@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.*
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorPatch
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorPost
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorSearch
-import ruby.ruby20244thquarteraddressableapi.domain.vendor.entity.Vendor
+import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.response.VendorResponse
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.service.VendorService
 
 @RestController
@@ -14,7 +14,7 @@ class VendorController(
 ) {
 
     @GetMapping
-    fun getList(@RequestBody vendorSearch: VendorSearch) : List<Vendor> {
+    fun getList(@RequestBody vendorSearch: VendorSearch) : List<VendorResponse> {
         return vendorService.getList(vendorSearch)
     }
 
