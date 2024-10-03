@@ -1,7 +1,5 @@
 package ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.response
 
-import ruby.ruby20244thquarteraddressableapi.domain.vendor.entity.VendorRole
-
 data class VendorResponse(
     val id: Long,
     val companyNumber: String,

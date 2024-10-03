@@ -14,7 +14,7 @@ data class VendorDetailResponse(
     val roleList: List<RoleCode> = listOf(),
     val userList: List<VendorUserInfo> = listOf()
 ) {
-    class VendorUserInfo(
+    data class VendorUserInfo(
         val id: Long,
         val userId: String,
         val name: String,
