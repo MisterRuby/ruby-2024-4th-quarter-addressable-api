@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorPatch
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorPost
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorSearch
+import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.response.VendorDetailResponse
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.response.VendorResponse
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.service.VendorService
 
@@ -19,18 +20,17 @@ class VendorController(
     }
 
     @GetMapping("/{id}")
-    fun get(@PathVariable("id") id: Long) {
-        // TODO - id 에 해당하는 업체 정보 조회
+    fun get(@PathVariable("id") id: Long) : VendorDetailResponse {
+        return vendorService.get(id)
     }
 
     @PostMapping
-    fun post(vendorPost: VendorPost) {
-        // TODO - 업체 정보 등록
+    fun post(@RequestBody vendorPost: VendorPost) {
         vendorService.post(vendorPost)
     }
 
     @PatchMapping("/{id}")
-    fun patch(@PathVariable("id") id: Long, vendorPatch: VendorPatch) {
+    fun patch(@PathVariable("id") id: Long, @RequestBody vendorPatch: VendorPatch) {
         // TODO - id 에 해당하는 업체 정보수정
     }
 

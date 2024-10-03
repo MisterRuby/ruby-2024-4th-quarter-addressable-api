@@ -10,6 +10,5 @@ data class VendorResponse(
     val email: String,
     val useYn: Boolean,
     val deleted: Boolean,
-    val vendorRoleList: MutableList<VendorRole> = mutableListOf(),
     val representativeUsername: String?
 )

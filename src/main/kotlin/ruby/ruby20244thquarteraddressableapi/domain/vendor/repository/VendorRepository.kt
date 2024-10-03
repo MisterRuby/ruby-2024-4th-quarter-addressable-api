@@ -16,4 +16,10 @@ interface VendorRepository : JpaRepository<Vendor, Long> {
             "or v.companyNumber like %:search% " +
             "order by v.id desc")
     fun findBySearch(@Param("search") search: String, pageable: Pageable) : Page<Vendor>
+
+    @Query("select v from Vendor v " +
+            "left join fetch v.representativeUserInfo " +
+            "left join fetch v.roleList " +
+            "where v.id = :id")
+    fun findDetailById(@Param("id") id: Long) : Vendor?
 }

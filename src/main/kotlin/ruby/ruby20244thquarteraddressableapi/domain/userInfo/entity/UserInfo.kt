@@ -18,10 +18,13 @@ class UserInfo(
     val email: String,
     @Column(nullable = false)
     val useYn: Boolean,
+    @Column(nullable = false)
+    val deleted: Boolean,
 
-    @OneToMany(mappedBy = "userRoleId.userInfo", fetch = FetchType.LAZY, cascade = [CascadeType.REMOVE])
-    val userRoleList: MutableList<UserRole> = mutableListOf(),
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vendor_id")
     val vendor: Vendor
-) : BaseColumn()
+) : BaseColumn() {
+    @OneToMany(mappedBy = "userRoleId.userInfo", fetch = FetchType.LAZY, cascade = [CascadeType.REMOVE])
+    val userRoleList: MutableList<UserRole> = mutableListOf()
+}
