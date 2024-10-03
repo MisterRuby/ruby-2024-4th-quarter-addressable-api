@@ -26,6 +26,7 @@ class VendorController(
     @PostMapping
     fun post(vendorPost: VendorPost) {
         // TODO - 업체 정보 등록
+        vendorService.post(vendorPost)
     }
 
     @PatchMapping("/{id}")

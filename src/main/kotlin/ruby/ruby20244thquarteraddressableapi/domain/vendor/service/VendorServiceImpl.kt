@@ -32,6 +32,7 @@ class VendorServiceImpl(
                     email = it.email,
                     useYn = it.useYn,
                     deleted = it.deleted,
+                    representativeUsername = it.representativeUserInfo?.name
                 )
             }
         }

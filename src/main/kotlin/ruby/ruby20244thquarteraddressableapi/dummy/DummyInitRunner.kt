@@ -1,4 +1,4 @@
-package ruby.ruby20244thquarteraddressableapi
+package ruby.ruby20244thquarteraddressableapi.dummy
 
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
@@ -6,7 +6,7 @@ import ruby.ruby20244thquarteraddressableapi.domain.vendor.entity.Vendor
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.repository.VendorRepository
 
 @Component
-class TestInitRunner (
+class DummyInitRunner (
     private val vendorRepository: VendorRepository
 ) : CommandLineRunner {
     override fun run(vararg args: String) {
