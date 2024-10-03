@@ -9,17 +9,17 @@ class UserInfo(
     @Column(unique = true, nullable = false)
     val userId: String,
     @Column(nullable = false)
-    val password: String,
+    var password: String,
     @Column(nullable = false)
-    val name: String,
+    var name: String,
     @Column(unique = true, nullable = false)
-    val phoneNumber: String,
+    var phoneNumber: String,
     @Column(unique = true, nullable = false)
-    val email: String,
+    var email: String,
     @Column(nullable = false)
-    val useYn: Boolean,
+    var useYn: Boolean,
     @Column(nullable = false)
-    val deleted: Boolean,
+    var deleted: Boolean,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vendor_id")

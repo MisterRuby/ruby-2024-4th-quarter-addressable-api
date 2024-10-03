@@ -10,15 +10,15 @@ class Vendor (
     @Column(nullable = false, unique = true)
     val companyNumber: String,
     @Column(nullable = false)
-    val name: String,
+    var name: String,
     @Column(nullable = false)
-    val contactNumber: String,
+    var contactNumber: String,
     @Column(nullable = false)
-    val email: String,
+    var email: String,
     @Column(nullable = false)
-    val useYn: Boolean,
+    var useYn: Boolean,
     @Column(nullable = false)
-    val deleted: Boolean,
+    var deleted: Boolean,
 
 ) : BaseColumn() {
     @OneToMany(mappedBy = "vendorRoleId.vendor", cascade = [CascadeType.REMOVE])

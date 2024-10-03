@@ -34,5 +34,12 @@ class DummyInitRunner (
             )
             vendorService.post(vendorPost)
         }
+
+        vendorRepository.findAll()
+            .filter { (it.id!! % 7).toInt() == 0 }
+            .forEach {
+                it.deleted = true
+                vendorRepository.save(it)
+            }
     }
 }
