@@ -10,6 +10,5 @@ interface VendorService {
     fun getList(vendorSearch: VendorSearch) : List<VendorResponse>
     fun get(id: Long) : VendorDetailResponse
     fun post(vendorPost: VendorPost)
-    fun patch(vendorPatch: VendorPatch)
-    fun delete(id: Long)
+    fun patch(id: Long, vendorPatch: VendorPatch)
 }

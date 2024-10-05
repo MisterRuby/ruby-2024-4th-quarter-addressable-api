@@ -27,6 +27,7 @@ class VendorController(
     /**
      * TODO
      * - 사업자 정보 등록시 증명하기 위한 사업자등록증 PDF 파일을 첨부하여 요청
+     * - 대표 정보 저장시 password 암호화 처리
      */
     @PostMapping
     fun post(@RequestBody vendorPost: VendorPost) {
@@ -35,11 +36,6 @@ class VendorController(
 
     @PatchMapping("/{id}")
     fun patch(@PathVariable("id") id: Long, @RequestBody vendorPatch: VendorPatch) {
-        // TODO - id 에 해당하는 업체 정보수정. soft delete 처리도 patch 요청으로 처리
-    }
-
-    @DeleteMapping("/{id}")
-    fun delete(@PathVariable("id") id: Long) {
-        // TODO - id 에 해당하는 업체 정보 삭제(soft delete)
+        vendorService.patch(id, vendorPatch)
     }
 }

@@ -79,7 +79,7 @@ class VendorServiceImpl(
                 contactNumber = contactNumber,
                 email = email,
                 useYn = true,
-                deleted = false,
+                deleted = false
             ).let { vendorRepository.save(it) }
 
             roleList
@@ -106,11 +106,31 @@ class VendorServiceImpl(
         }
     }
 
-    override fun patch(vendorPatch: VendorPatch) {
-        TODO("Not yet implemented")
-    }
-
-    override fun delete(id: Long) {
-        TODO("Not yet implemented")
+    @Transactional
+    override fun patch(id: Long, vendorPatch: VendorPatch) {
+        vendorRepository.findDetailById(id)?.also {vendor ->
+            vendorPatch.name?.let { vendor.name = it }
+            vendorPatch.contactNumber?.let { vendor.contactNumber = it }
+            vendorPatch.email?.let { vendor.email = it }
+            vendorPatch.useYn?.let { vendor.useYn = it }
+            vendorPatch.deleted?.let { vendor.deleted = it }
+            vendorPatch.representativeUserId?.let {id ->
+                userInfoRepository.findByIdAndVendor(id, vendor)?.let {
+                    vendor.representativeUserInfo = it
+                } ?: throw RuntimeException("사용자 정보를 찾을 수 없습니다.")
+            }
+            // 권한 수정
+            vendorPatch.roleList?.let { patchRoleList ->
+                // patchRoleList 에 없는 기존 권한 삭제
+                vendor.roleList
+                    .filterNot { patchRoleList.contains(it.vendorRoleId.roleCode.name)}
+                    .let { vendorRoleRepository.deleteAll(it) }
+                // 기존 권한에 없던 신규 권한 추가
+                patchRoleList
+                    .filterNot { role -> vendor.roleList.map { it.vendorRoleId.roleCode.name }.contains(role) }
+                    .map { VendorRole(VendorRoleId(vendor, RoleCode.valueOf(it))) }
+                    .let { vendorRoleRepository.saveAll(it) }
+            }
+        } ?: throw RuntimeException("업체 정보를 찾을 수 없습니다.")
     }
 }
