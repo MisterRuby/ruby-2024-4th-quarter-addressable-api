@@ -20,11 +20,13 @@ class Vendor (
     @Column(nullable = false)
     var deleted: Boolean,
 
+    @OneToOne(fetch = LAZY, cascade = [CascadeType.REMOVE])
+    var supportingDocument: VendorSupportingDocument
 ) : BaseColumn() {
-    @OneToMany(mappedBy = "vendorRoleId.vendor", cascade = [CascadeType.REMOVE])
-    val roleList: MutableList<VendorRole> = mutableListOf()
     @OneToOne(fetch = LAZY)
     var representativeUserInfo: UserInfo? = null
+    @OneToMany(mappedBy = "vendorRoleId.vendor", cascade = [CascadeType.REMOVE])
+    val roleList: MutableList<VendorRole> = mutableListOf()
     @OneToMany(mappedBy = "vendor", cascade = [CascadeType.REMOVE])
     val userList: MutableList<UserInfo> = mutableListOf()
 }

@@ -1,6 +1,8 @@
 package ruby.ruby20244thquarteraddressableapi.domain.vendor
 
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorPatch
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorPost
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorSearch
@@ -8,6 +10,12 @@ import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.response.VendorDe
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.response.VendorResponse
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.service.VendorService
 
+/**
+ * TODO
+ * - 요청값 Validation 처리
+ * - 공통 예외 처리
+ * - 요청시 권한 검증
+ */
 @RestController
 @RequestMapping("/vendors")
 class VendorController(
@@ -26,12 +34,16 @@ class VendorController(
 
     /**
      * TODO
-     * - 사업자 정보 등록시 증명하기 위한 사업자등록증 PDF 파일을 첨부하여 요청
+     * - 첨부파일 확장자 검증(AOP)
      * - 대표 정보 저장시 password 암호화 처리
      */
     @PostMapping
-    fun post(@RequestBody vendorPost: VendorPost) {
-        vendorService.post(vendorPost)
+    @ResponseStatus(code = HttpStatus.CREATED)
+    fun post(
+        @RequestPart("vendor") vendorPost: VendorPost,
+        @RequestParam("supportingDocument") supportingDocument: MultipartFile
+    ) {
+        vendorService.post(vendorPost, supportingDocument)
     }
 
     @PatchMapping("/{id}")

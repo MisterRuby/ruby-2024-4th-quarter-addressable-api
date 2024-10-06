@@ -1,8 +1,12 @@
 package ruby.ruby20244thquarteraddressableapi.domain.vendor.service
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
+import ruby.ruby20244thquarteraddressableapi.common.code.FileExtension
+import ruby.ruby20244thquarteraddressableapi.common.code.FilePath
 import ruby.ruby20244thquarteraddressableapi.common.code.RoleCode
 import ruby.ruby20244thquarteraddressableapi.domain.userInfo.entity.UserInfo
 import ruby.ruby20244thquarteraddressableapi.domain.userInfo.repository.UserInfoRepository
@@ -13,17 +17,24 @@ import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.response.VendorDe
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.response.VendorResponse
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.entity.Vendor
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.entity.VendorRole
+import ruby.ruby20244thquarteraddressableapi.domain.vendor.entity.VendorSupportingDocument
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.entity.embedded.VendorRoleId
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.repository.VendorRepository
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.repository.VendorRoleRepository
+import ruby.ruby20244thquarteraddressableapi.domain.vendor.repository.VendorSupportingDocumentRepository
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.*
 
 @Service
 class VendorServiceImpl(
     private val vendorRepository: VendorRepository,
     private val vendorRoleRepository: VendorRoleRepository,
-    private val userInfoRepository: UserInfoRepository
+    private val vendorSupportingDocumentRepository: VendorSupportingDocumentRepository,
+    private val userInfoRepository: UserInfoRepository,
+    @Value("\${file.upload-dir}") private val uploadDir: String
 ) : VendorService {
-
     override fun getList(vendorSearch: VendorSearch) : List<VendorResponse> {
         return vendorSearch.run {
             val pageable = PageRequest.of(page - 1, pageSize)
@@ -53,7 +64,18 @@ class VendorServiceImpl(
                 email = email,
                 useYn = useYn,
                 deleted = deleted,
-                representativeUsername = representativeUserInfo?.name,
+                representativeUserInfo = representativeUserInfo?.run {
+                    VendorDetailResponse.RepresentativeUserInfo(
+                        id = id,
+                        name = name
+                    )
+                },
+                supportingDocument = supportingDocument.run {
+                    VendorDetailResponse.SupportingDocument(
+                        id = id,
+                        originalFilename = originalFilename
+                    )
+                },
                 roleList = roleList.map { it.vendorRoleId.roleCode },
                 userList = userList.map {
                     VendorDetailResponse.VendorUserInfo(
@@ -71,7 +93,26 @@ class VendorServiceImpl(
     }
 
     @Transactional
-    override fun post(vendorPost: VendorPost) {
+    @Throws(IOException::class)
+    override fun post(vendorPost: VendorPost, supportingDocument: MultipartFile) {
+        val vendorSupportingDocument = supportingDocument.let {file ->
+            file.originalFilename?.let {
+                val extension = getFileExtension(it)
+                val filename = "${UUID.randomUUID()}.$extension"
+                val filePath = Paths.get("$uploadDir/${FilePath.VENDOR_SUPPORTING_DOCUMENT.path}/$filename")
+                Files.createDirectories(filePath.parent)
+                Files.copy(file.inputStream, filePath)
+                val vendorSupportingDocument = VendorSupportingDocument(
+                    originalFilename = it,
+                    filename = filename,
+                    filePath = filePath.toString(),
+                    fileSize = file.size,
+                    fileExtension = FileExtension.valueOf(extension.uppercase())
+                )
+                vendorSupportingDocumentRepository.save(vendorSupportingDocument)
+            } ?: throw IOException("파일명이 올바르지 않습니다.")
+        }
+
         vendorPost.apply {
             val vendor = Vendor(
                 companyNumber = companyNumber,
@@ -79,7 +120,8 @@ class VendorServiceImpl(
                 contactNumber = contactNumber,
                 email = email,
                 useYn = true,
-                deleted = false
+                deleted = false,
+                supportingDocument = vendorSupportingDocument
             ).let { vendorRepository.save(it) }
 
             roleList
@@ -88,7 +130,7 @@ class VendorServiceImpl(
 
             representativeUserInfo
                 .run {
-                    UserInfo(
+                    val userInfo = UserInfo(
                         userId = userId,
                         password = password,
                         name = name,
@@ -98,12 +140,15 @@ class VendorServiceImpl(
                         deleted = false,
                         vendor = vendor
                     )
-                }.let {
-                    userInfoRepository.save(it)
-                    vendor.representativeUserInfo = it
-                    vendorRepository.save(vendor)
+                    vendor.representativeUserInfo = userInfoRepository.save(userInfo)
                 }
+
+            vendorRepository.save(vendor)
         }
+    }
+
+    private fun getFileExtension(fileName: String): String {
+        return fileName.substringAfterLast('.', "")
     }
 
     @Transactional

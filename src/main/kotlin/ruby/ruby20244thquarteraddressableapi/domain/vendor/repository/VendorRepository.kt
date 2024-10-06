@@ -18,6 +18,7 @@ interface VendorRepository : JpaRepository<Vendor, Long> {
 
     @Query("select v from Vendor v " +
             "left join fetch v.representativeUserInfo " +
+            "left join fetch v.supportingDocument " +
             "left join fetch v.roleList " +
             "where v.id = :id " +
             "and v.deleted = false")

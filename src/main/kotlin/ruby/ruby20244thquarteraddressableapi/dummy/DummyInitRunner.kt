@@ -1,22 +1,46 @@
 package ruby.ruby20244thquarteraddressableapi.dummy
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
+import org.springframework.web.multipart.MultipartFile
+import ruby.ruby20244thquarteraddressableapi.common.code.FilePath
 import ruby.ruby20244thquarteraddressableapi.common.code.RoleCode
 import ruby.ruby20244thquarteraddressableapi.domain.userInfo.repository.UserInfoRepository
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.dto.request.VendorPost
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.repository.VendorRepository
 import ruby.ruby20244thquarteraddressableapi.domain.vendor.service.VendorService
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
 
 @Component
 class DummyInitRunner (
     private val vendorRepository: VendorRepository,
     private val userInfoRepository: UserInfoRepository,
-    private val vendorService: VendorService
+    private val vendorService: VendorService,
+    @Value("\${file.upload-dir}") private val uploadDir: String
 ) : CommandLineRunner {
     override fun run(vararg args: String) {
+        val vendorSupportingDocumentPath = "$uploadDir/${FilePath.VENDOR_SUPPORTING_DOCUMENT.path}"
+        Files.walk(Path.of(vendorSupportingDocumentPath))
+            .sorted(Comparator.reverseOrder())
+            .forEach {
+                if (it.isRegularFile()) {
+                    Files.delete(it)
+                } else if (it.isDirectory()) {
+                    Files.delete(it)
+                }
+            }
+
+        val filePath = "$uploadDir/test/testPdf.pdf"  // Example file path
+        val file = File(filePath)
+        val supportingDocument: MultipartFile = FileToMultipartFile(file)
+
         val roleCodeList = RoleCode.values()
-        (1..1000).forEach {
+        (1..34).forEach {
             val key = it.toString()
             val vendorPost = VendorPost(
                 companyNumber = "12345600000".substring(0, 10 - key.length) + key,
@@ -32,7 +56,7 @@ class DummyInitRunner (
                     email = "user$key@email.com",
                 )
             )
-            vendorService.post(vendorPost)
+            vendorService.post(vendorPost, supportingDocument)
         }
 
         vendorRepository.findAll()
