@@ -1,5 +1,6 @@
 package ruby.ruby20244thquarteraddressableapi.domain.vendor
 
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -12,8 +13,6 @@ import ruby.ruby20244thquarteraddressableapi.domain.vendor.service.VendorService
 
 /**
  * TODO
- * - 요청값 Validation 처리
- * - 공통 예외 처리
  * - 요청시 권한 검증
  */
 @RestController
@@ -23,7 +22,7 @@ class VendorController(
 ) {
 
     @GetMapping
-    fun getList(@RequestBody vendorSearch: VendorSearch) : List<VendorResponse> {
+    fun getList(@RequestBody @Valid vendorSearch: VendorSearch) : List<VendorResponse> {
         return vendorService.getList(vendorSearch)
     }
 
@@ -40,7 +39,7 @@ class VendorController(
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     fun post(
-        @RequestPart("vendor") vendorPost: VendorPost,
+        @RequestPart("vendor") @Valid vendorPost: VendorPost,
         @RequestParam("supportingDocument") supportingDocument: MultipartFile
     ) {
         vendorService.post(vendorPost, supportingDocument)

@@ -10,7 +10,5 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         default_batch_fetch_size: 1000
 
-
-
 file:
   upload-dir: /Users/ruby/Desktop/project/ruby_2024_4th_quarter/ruby-2024-4th-quarter-addressable-api/files
